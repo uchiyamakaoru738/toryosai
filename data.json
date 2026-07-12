@@ -1,8 +1,8 @@
 {
   "eventName": "稲稜祭タイムテーブル",
-  "version": 10,
-  "updatedAt": "2026-07-12T16:30:00+09:00",
-  "updateNote": "（記入例）タイムテーブルを更新しました",
+  "version": 11,
+  "updatedAt": "2026-07-12T17:00:00+09:00",
+  "updateNote": "LINE通知のテストです。アプリの内容に変更はありません。",
   "days": [
     { "id": "day1", "label": "1日目", "date": "7/12(日)", "isoDate": "2026-07-12" },
     { "id": "day2", "label": "2日目", "date": "7/13(月)", "isoDate": "2026-07-13" }
