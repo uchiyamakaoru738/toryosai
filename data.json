@@ -1,0 +1,137 @@
+{
+  "eventName": "稲稜祭タイムテーブル",
+  "version": 10,
+  "updatedAt": "2026-07-12T16:30:00+09:00",
+  "updateNote": "（記入例）タイムテーブルを更新しました",
+  "days": [
+    { "id": "day1", "label": "1日目", "date": "7/12(日)", "isoDate": "2026-07-12" },
+    { "id": "day2", "label": "2日目", "date": "7/13(月)", "isoDate": "2026-07-13" }
+  ],
+  "notices": [
+    "【集合】1日目 8:40〜／2日目 9:00〜 大会議室で取材説明",
+    "10:30以前に取材のない人は、担当取材の30分前登校でも可",
+    "杜カメラ・SDカードはリレー式。次の担当者に必ず手渡しすること",
+    "1日目の進捗次第で、撮影ヘルプをお願いする場合があります"
+  ],
+  "sdCards": {
+    "day1": [
+      { "id": "1-1", "use": "杜カメラ①" },
+      { "id": "2-1", "use": "杜カメラ②" },
+      { "id": "3-1", "use": "杜カメラ③" },
+      { "id": "4-1", "use": "杜カメラ④" },
+      { "id": "5-1", "use": "杜カメラ⑤" },
+      { "id": "0-1", "use": "野田" },
+      { "id": "0-2", "use": "内山" },
+      { "id": "0-3", "use": "桑山" },
+      { "id": "0-4", "use": "井上" },
+      { "id": "0-5", "use": "加藤" },
+      { "id": "0-6", "use": "3G村上" },
+      { "id": "0-7", "use": "川田" },
+      { "id": "0-8", "use": "" },
+      { "id": "0-9", "use": "" },
+      { "id": "0-10", "use": "" }
+    ],
+    "day2": [
+      { "id": "1-2", "use": "杜カメラ①" },
+      { "id": "2-2", "use": "杜カメラ②" },
+      { "id": "3-2", "use": "杜カメラ③" },
+      { "id": "4-2", "use": "杜カメラ④" },
+      { "id": "5-2", "use": "杜カメラ⑤" },
+      { "id": "4-1", "use": "桑山" },
+      { "id": "5-1", "use": "井上" },
+      { "id": "0-1", "use": "川田" },
+      { "id": "0-2", "use": "石渡" },
+      { "id": "0-3", "use": "綾部" },
+      { "id": "0-4", "use": "林" },
+      { "id": "0-5", "use": "大澤" },
+      { "id": "0-6", "use": "黛" },
+      { "id": "0-7", "use": "3G村上" },
+      { "id": "0-8", "use": "野田" },
+      { "id": "0-9", "use": "加藤" },
+      { "id": "0-10", "use": "内山" }
+    ]
+  },
+  "stages": [
+    { "id": "main", "name": "メインステージ", "color": "#ff5470" },
+    { "id": "hall", "name": "稲稜ホール", "color": "#ffd166" },
+    { "id": "light", "name": "軽音ステージ", "color": "#3ec9ff" },
+    { "id": "field", "name": "野球場", "color": "#7ed957" }
+  ],
+  "programs": [
+    { "dayId": "day1", "stageId": "main", "start": "09:20", "end": "09:45", "title": "開会式", "performer": "実行委員会", "camera": [{ "name": "野田", "cam": "カ" }, { "name": "内山", "cam": "カ" }], "tips": "（記入例）ステージ全景→実行委員長の寄りの順で。朝は逆光気味なので露出補正＋2/3を目安に。" },
+    { "dayId": "day1", "stageId": "main", "start": "10:10", "end": "10:20", "title": "演劇部（10分）", "performer": "演劇部", "camera": [{ "name": "野田", "cam": "カ" }, { "name": "内山", "cam": "カ" }] },
+    { "dayId": "day1", "stageId": "main", "start": "10:45", "end": "11:35", "title": "有志① ダンス（50分）", "performer": "有志①（D4CE→Lune'a→Pherah*→HNJ48→Bunnies→NewBbit）", "camera": [{ "name": "戸田", "cam": "1" }, { "name": "福田", "cam": "2" }], "tips": "（記入例）動きが速いのでシャッター速度1/500以上。曲間の決めポーズを狙うと歩留まりが良い。" },
+    { "dayId": "day1", "stageId": "main", "start": "11:40", "end": "12:10", "title": "應援部チア（30分）", "performer": "應援部", "camera": [{ "name": "野田", "cam": "カ" }, { "name": "福田", "cam": "2" }, { "name": "1F伊藤", "cam": "1" }] },
+    { "dayId": "day1", "stageId": "main", "start": "13:00", "end": "15:00", "title": "軽音楽部（120分）", "performer": "軽音楽部", "camera": [{ "name": "1F伊藤", "cam": "1" }, { "name": "松井", "cam": "2" }] },
+    { "dayId": "day1", "stageId": "main", "start": "15:00", "end": "15:30", "title": "中夜祭", "performer": "実行委員会", "camera": [{ "name": "野田", "cam": "カ" }, { "name": "千葉", "cam": "1" }, { "name": "古森", "cam": "2" }, { "name": "三井", "cam": "4" }, { "name": "大塚", "cam": "3" }] },
+
+    { "dayId": "day1", "stageId": "hall", "start": "10:00", "end": "10:30", "title": "映画部（30分）", "performer": "映画部", "camera": [{ "name": "桑山", "cam": "カ" }, { "name": "戸田", "cam": "1" }] },
+    { "dayId": "day1", "stageId": "hall", "start": "10:35", "end": "11:45", "title": "演劇部（70分）", "performer": "演劇部", "camera": [{ "name": "高田", "cam": "5" }, { "name": "水飼", "cam": "3" }] },
+    { "dayId": "day1", "stageId": "hall", "start": "11:45", "end": "12:00", "title": "有志② 演奏（15分）", "performer": "有志②（Auréa）", "camera": [{ "name": "桑山", "cam": "カ" }, { "name": "高田", "cam": "5" }] },
+    { "dayId": "day1", "stageId": "hall", "start": "12:00", "end": "13:00", "title": "ピアノ部（60分）", "performer": "ピアノ部", "camera": [{ "name": "桑山", "cam": "カ" }, { "name": "水飼", "cam": "3" }] },
+    { "dayId": "day1", "stageId": "hall", "start": "13:00", "end": "13:15", "title": "有志⑥ 演奏（15分）", "performer": "有志⑥（元ブラスバンド部3年）", "camera": [{ "name": "加藤", "cam": "カ" }, { "name": "2A村上", "cam": "4" }] },
+
+    { "dayId": "day1", "stageId": "light", "start": "10:00", "end": "12:15", "title": "軽音楽部 バンドリレー（130分）", "performer": "TetraLumine / きまま日和 / れーげんぼーげん / SilentHarmony / andyou? / FlowerGrove*10 / さむたっく。/ Hangover / 0.17 ほか", "camera": [{ "name": "井上", "cam": "カ" }, { "name": "柳瀬", "cam": "4" }], "tips": "（記入例）照明が暗いのでISO上限を上げる。1バンドにつきボーカル・ギター・ドラム＋全体を1枚ずつ。" },
+    { "dayId": "day1", "stageId": "light", "start": "13:00", "end": "15:00", "title": "有志バンドリレー", "performer": "＠ホームついんてーる。/ Ricca / F.O.O.L / 臨時バンド③くぐりど ほか", "camera": [{ "name": "千葉", "cam": "1" }, { "name": "古森", "cam": "2" }, { "name": "水飼", "cam": "3" }, { "name": "加藤", "cam": "カ" }, { "name": "三井", "cam": "4" }] },
+
+    { "dayId": "day2", "stageId": "field", "start": "09:40", "end": "11:10", "title": "早慶戦", "performer": "野球部", "camera": [{ "name": "林", "cam": "カ" }, { "name": "森", "cam": "カ" }] },
+
+    { "dayId": "day2", "stageId": "main", "start": "10:35", "end": "11:10", "title": "有志③ ダンス（35分）", "performer": "有志③（ナツメグ→E.Y.S.M.→LilyPop→めろりんってしてみて→S.H.Breakers）", "camera": [{ "name": "福田", "cam": "カ" }, { "name": "2A村上", "cam": "3" }, { "name": "毛海", "cam": "2" }] },
+    { "dayId": "day2", "stageId": "main", "start": "11:00", "end": "11:15", "title": "有志④ ダンス・漫才（15分）", "performer": "有志④（ハピエネ→南雲ロマンス）", "camera": [{ "name": "石渡", "cam": "カ" }, { "name": "鹿島", "cam": "2" }] },
+    { "dayId": "day2", "stageId": "main", "start": "11:40", "end": "12:30", "title": "WDC（50分）", "performer": "WDC（ダンスサークル）", "camera": [{ "name": "3G村上", "cam": "カ" }, { "name": "大塚", "cam": "1" }, { "name": "毛海", "cam": "2" }, { "name": "保戸塚", "cam": "4" }, { "name": "内山", "cam": "カ" }] },
+    { "dayId": "day2", "stageId": "main", "start": "12:55", "end": "14:25", "title": "應援部（90分）", "performer": "應援部", "camera": [{ "name": "川田", "cam": "カ" }, { "name": "大澤", "cam": "カ" }, { "name": "大塚", "cam": "1" }], "note": "（記入例）進行5分遅れ" },
+    { "dayId": "day2", "stageId": "main", "start": "15:00", "end": "16:00", "title": "後夜祭", "performer": "実行委員会", "camera": [{ "name": "野田", "cam": "カ" }, { "name": "大澤", "cam": "カ" }, { "name": "3G村上", "cam": "カ" }, { "name": "毛海", "cam": "1" }, { "name": "千葉", "cam": "2" }, { "name": "保戸塚", "cam": "4" }, { "name": "森", "cam": "5" }] },
+
+    { "dayId": "day2", "stageId": "hall", "start": "10:20", "end": "10:40", "title": "ブラスバンド部（20分）", "performer": "ブラスバンド部", "camera": [{ "name": "福田", "cam": "4" }, { "name": "2A村上", "cam": "2" }, { "name": "綾部", "cam": "3" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "11:00", "end": "12:00", "title": "グリークラブ（60分）", "performer": "グリークラブ", "camera": [{ "name": "藤田", "cam": "5" }, { "name": "丸田", "cam": "5" }, { "name": "保戸塚", "cam": "カ" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "11:30", "end": "12:00", "title": "書道部（30分）", "performer": "書道部", "camera": [{ "name": "黛", "cam": "カ" }, { "name": "2A村上", "cam": "4" }, { "name": "毛海", "cam": "2" }, { "name": "加藤", "cam": "カ" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "11:40", "end": "11:55", "title": "有志⑤ 演奏（15分）", "performer": "有志⑤（劇団じぶろ）", "camera": [{ "name": "藤田", "cam": "5" }, { "name": "丸田", "cam": "5" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "12:05", "end": "13:15", "title": "ピアノ部（70分）", "performer": "ピアノ部", "camera": [{ "name": "黛", "cam": "カ" }, { "name": "加藤", "cam": "カ" }, { "name": "2A村上", "cam": "4" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "12:40", "end": "12:55", "title": "有志⑥ 演奏（15分）", "performer": "有志⑥", "camera": [{ "name": "加藤", "cam": "カ" }, { "name": "2A村上", "cam": "4" }, { "name": "丸田", "cam": "5" }, { "name": "藤田", "cam": "5" }] },
+    { "dayId": "day2", "stageId": "hall", "start": "13:00", "end": "14:10", "title": "演劇部（70分）", "performer": "演劇部", "camera": [{ "name": "森", "cam": "5" }, { "name": "鹿島", "cam": "3" }] },
+
+    { "dayId": "day2", "stageId": "light", "start": "09:40", "end": "14:10", "title": "軽音楽部 バンドリレー（290分）", "performer": "co:Polaris / ∴ / GrandChariot / 別に朝でもいいけど / まかもん / トゥモロー / 無黎明 / Pending / SheepSync / JizaShakle / D♡LCE / ひがくれ / √we / それはちがくね？/ Pulse for Lily / あいさじりか ほか", "camera": [{ "name": "熊谷", "cam": "1" }, { "name": "内山", "cam": "カ" }] }
+  ],
+  "exhibits": [
+    {
+      "category": "文化部・委員会",
+      "items": [
+        { "name": "美術部", "desc": "作品展示" },
+        { "name": "写真部", "desc": "作品展示" },
+        { "name": "科学部", "desc": "体験型実験コーナー" },
+        { "name": "茶道部", "desc": "お茶会（要整理券）" },
+        { "name": "図書委員会", "desc": "ブックカフェ企画" },
+        { "name": "家庭科部", "desc": "手作り雑貨販売" }
+      ]
+    },
+    {
+      "category": "クラス企画",
+      "items": [
+        { "name": "1年A組", "desc": "教室企画（内容未定）" },
+        { "name": "1年B組", "desc": "教室企画（内容未定）" },
+        { "name": "1年C組", "desc": "教室企画（内容未定）" },
+        { "name": "1年D組", "desc": "教室企画（内容未定）" },
+        { "name": "1年E組", "desc": "教室企画（内容未定）" },
+        { "name": "1年F組", "desc": "教室企画（内容未定）" },
+        { "name": "1年G組", "desc": "教室企画（内容未定）" },
+        { "name": "1年H組", "desc": "教室企画（内容未定）" },
+        { "name": "2年A組", "desc": "教室企画（内容未定）" },
+        { "name": "2年B組", "desc": "教室企画（内容未定）" },
+        { "name": "2年C組", "desc": "教室企画（内容未定）" },
+        { "name": "2年D組", "desc": "教室企画（内容未定）" },
+        { "name": "2年E組", "desc": "教室企画（内容未定）" },
+        { "name": "2年F組", "desc": "教室企画（内容未定）" },
+        { "name": "2年G組", "desc": "教室企画（内容未定）" },
+        { "name": "2年H組", "desc": "教室企画（内容未定）" },
+        { "name": "3年A組", "desc": "教室企画（内容未定）" },
+        { "name": "3年B組", "desc": "教室企画（内容未定）" },
+        { "name": "3年C組", "desc": "教室企画（内容未定）" },
+        { "name": "3年D組", "desc": "教室企画（内容未定）" },
+        { "name": "3年E組", "desc": "教室企画（内容未定）" },
+        { "name": "3年F組", "desc": "教室企画（内容未定）" },
+        { "name": "3年G組", "desc": "教室企画（内容未定）" },
+        { "name": "3年H組", "desc": "教室企画（内容未定）" }
+      ]
+    }
+  ]
+}

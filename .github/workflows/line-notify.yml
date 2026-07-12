@@ -1,0 +1,46 @@
+# data.json が更新されたら、LINE公式アカウント（Messaging API）の友だち全員に通知を送る。
+#
+# 使うための準備（README.md の「LINE通知」参照）:
+#   1. LINE Developers で Messaging API チャネルを作成
+#   2. チャネルアクセストークン（長期）を発行
+#   3. GitHubリポジトリの Settings > Secrets and variables > Actions に
+#      LINE_CHANNEL_ACCESS_TOKEN という名前で登録
+#   4. 下の APP_URL をGitHub PagesのURLに書き換える
+#   5. 撮影担当者にBotを友だち追加してもらう（QRコードを共有）
+#
+# トークン未設定のうちは何もせず正常終了するので、先にコミットしておいて問題ありません。
+
+name: LINE通知
+
+on:
+  push:
+    branches: [main]
+    paths: [data.json]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: LINEへ更新通知を送信
+        env:
+          TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          APP_URL: "https://＜ユーザー名＞.github.io/＜リポジトリ名＞/"
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "LINE_CHANNEL_ACCESS_TOKEN が未設定のためスキップします"
+            exit 0
+          fi
+          VERSION=$(jq -r '.version' data.json)
+          NOTE=$(jq -r '.updateNote // ""' data.json)
+          MSG="📸 稲稜祭タイムテーブルが更新されました（v${VERSION}）"
+          if [ -n "$NOTE" ]; then
+            MSG="${MSG}"$'\n'"${NOTE}"
+          fi
+          MSG="${MSG}"$'\n'"${APP_URL}"
+          jq -n --arg text "$MSG" '{messages:[{type:"text",text:$text}]}' \
+            | curl -sS --fail-with-body -X POST https://api.line.me/v2/bot/message/broadcast \
+                -H "Authorization: Bearer $TOKEN" \
+                -H "Content-Type: application/json" \
+                -d @-

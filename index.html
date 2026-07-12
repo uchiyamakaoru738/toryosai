@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>稲稜祭タイムテーブル</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14141c">
+<style>
+  :root{
+    --bg:#14141c;
+    --card:#1f1f2b;
+    --card2:#262636;
+    --text:#f4f4f8;
+    --sub:#9a9ab0;
+    --accent:#ff5470;
+    --line:#33334a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;}
+  header{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,#1a1a26,#14141cee);
+    backdrop-filter:blur(6px);
+    padding:14px 16px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  header h1{margin:0;font-size:17px;font-weight:700;}
+  header .meta{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:11px;color:var(--sub);}
+  #netStatus{display:flex;align-items:center;gap:4px;}
+  #netStatus .dot{width:7px;height:7px;border-radius:50%;background:#3ec97a;}
+  #netStatus.offline .dot{background:#ff5470;}
+  #updateBanner{
+    display:none;margin-top:8px;padding:8px 10px;border-radius:10px;
+    background:#ffd16622;border:1px solid #ffd16655;color:#ffd166;font-size:12.5px;
+    align-items:center;justify-content:space-between;gap:8px;
+  }
+  #updateBanner button{
+    background:#ffd166;color:#14141c;border:none;border-radius:6px;
+    padding:5px 10px;font-size:12px;font-weight:700;
+  }
+  .dayTabs{display:flex;gap:6px;margin-top:12px;}
+  .dayTab{
+    flex:1;text-align:center;padding:8px 0;border-radius:10px;font-size:13px;font-weight:700;
+    background:var(--card2);color:var(--sub);border:1px solid transparent;
+  }
+  .dayTab.active{background:var(--text);color:var(--bg);}
+  .tabs{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;}
+  .tab{
+    flex:0 0 auto;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;
+    background:var(--card2);color:var(--sub);white-space:nowrap;border:1px solid transparent;
+  }
+  .tab.active{color:#14141c;}
+  .filterRow{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--sub);}
+  .filterRow select{
+    background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;
+    padding:5px 8px;font-size:12.5px;flex:1;
+  }
+  .camLegend{margin-top:6px;font-size:11px;color:var(--sub);}
+  .camLegend .lgOwn{color:#ffd166;}
+  .camLegend .lgMori{color:#3ec9ff;}
+  main{padding:14px 16px 60px;}
+
+  .notices{
+    margin-bottom:14px;background:#ffd16612;border:1px solid #ffd16633;border-radius:10px;
+    padding:8px 12px;font-size:12px;color:var(--sub);
+  }
+  .notices summary{color:#ffd166;font-weight:700;font-size:12.5px;cursor:pointer;}
+  .notices ul{margin:8px 0 2px;padding-left:18px;}
+  .notices li{margin-bottom:4px;line-height:1.5;}
+  .sdBox{background:#3ec9ff12;border-color:#3ec9ff33;}
+  .sdBox summary{color:#3ec9ff;}
+  .sdGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:4px;margin-top:8px;}
+  .sdCell{font-size:11.5px;background:#ffffff0a;border-radius:6px;padding:4px 7px;color:var(--text);}
+  .sdCell b{color:#3ec9ff;margin-right:2px;}
+  .sdCell.sdSpare{opacity:.45;}
+
+  .stageBlock{margin-bottom:22px;}
+  .stageBlock h2{
+    font-size:14px;margin:0 0 8px;padding-left:10px;border-left:4px solid var(--accent);
+  }
+  .viewHint{font-size:11px;color:var(--sub);margin:-4px 0 10px;}
+  .timeline{position:relative;padding-left:62px;}
+  .timeline::before{
+    content:"";position:absolute;left:54px;top:0;bottom:0;width:2px;background:var(--line);
+  }
+  .item{
+    position:relative;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:10px;
+    border:1px solid var(--line);cursor:pointer;
+  }
+  .item.pastItem{background:#191920;border-color:#2a2a38;}
+  .item.pastItem .title{color:#8a8a9c;}
+  .item.pastItem .sub{color:#5f5f72;}
+  .item.pastItem .cam{opacity:.55;}
+  .item.nowItem{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+  .item .time{
+    position:absolute;left:-62px;top:10px;width:46px;text-align:right;font-size:11px;color:var(--sub);
+    font-variant-numeric:tabular-nums;
+  }
+  .item .dot{
+    position:absolute;left:-11.5px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--line);
+    border:2px solid var(--bg);
+  }
+  .item.nowItem .dot{background:var(--accent);}
+  .item .title{font-size:14.5px;font-weight:700;}
+  .item .title .doneBadge{
+    display:inline-block;margin-left:8px;padding:2px 8px;border-radius:20px;
+    font-size:10.5px;font-weight:700;vertical-align:2px;
+    background:#3a3a4a;color:#b8b8c8;
+  }
+  .stageChip{
+    display:inline-block;margin-right:6px;padding:2px 8px;border-radius:20px;
+    font-size:10.5px;font-weight:700;color:#14141c;vertical-align:2px;
+  }
+  .item .sub{margin-top:3px;font-size:12px;color:var(--sub);display:flex;flex-wrap:wrap;gap:8px;}
+  .item .camRow{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;}
+  .cam{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
+    background:#ffffff10;padding:3px 8px;border-radius:20px;color:#fff;
+  }
+  .cam b{font-weight:700;}
+  .cam.camOwn{background:#ffd16622;border:1px solid #ffd16644;}
+  .cam.camOwn b{color:#ffd166;}
+  .cam.camMori{background:#3ec9ff22;border:1px solid #3ec9ff44;}
+  .cam.camMori b{color:#3ec9ff;}
+  .cam.camActive{background:var(--accent);border-color:var(--accent);color:#14141c;font-weight:700;}
+  .cam.camActive b{color:#14141c;}
+  .item .note{margin-top:5px;font-size:11.5px;color:#ffd166;}
+  .emptyMsg{color:var(--sub);font-size:13px;padding:20px 4px;text-align:center;}
+  .exGroup{margin-bottom:20px;}
+  .exGroup h2{font-size:14px;margin:0 0 8px;padding-left:10px;border-left:4px solid #ffd166;}
+  .exGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .exCard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;}
+  .exCard .name{font-size:13px;font-weight:700;}
+  .exCard .desc{font-size:11px;color:var(--sub);margin-top:2px;}
+
+  /* ===== 横並びグリッド（横向きスマホ・PC） ===== */
+  .gridWrap{display:flex;gap:8px;align-items:flex-start;}
+  .gTimeCol{flex:0 0 36px;}
+  .gCol{flex:1;min-width:0;}
+  .gExCol{flex:0 0 150px;}
+  .gColHead{
+    height:30px;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;border-radius:8px 8px 0 0;color:#14141c;
+    overflow:hidden;white-space:nowrap;
+  }
+  .gTimeCol .gColHead{background:none;}
+  .gColBody{
+    position:relative;background:var(--card);border:1px solid var(--line);border-radius:0 0 8px 8px;
+  }
+  .gTimeCol .gColBody{background:none;border:none;}
+  .gHourLabel{
+    position:absolute;right:4px;transform:translateY(-50%);
+    font-size:10px;color:var(--sub);font-variant-numeric:tabular-nums;
+  }
+  .gHourLine{position:absolute;left:0;right:0;height:1px;background:var(--line);opacity:.5;}
+  .gBlock{
+    position:absolute;border-radius:6px;padding:2px 5px;overflow:hidden;cursor:pointer;
+    font-size:10.5px;line-height:1.3;border-left:3px solid;
+  }
+  .gBlock .gT{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .gBlock .gTime{font-size:9.5px;color:var(--sub);font-variant-numeric:tabular-nums;}
+  .gBlock .gNoteLine{color:#ffd166;font-size:9.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .gBlock.gPast{filter:grayscale(1);opacity:.45;}
+  .gBlock.gNow{box-shadow:0 0 0 1.5px var(--accent);}
+  .gBlock.gDim{opacity:.18;}
+  .gNowLine{position:absolute;left:0;right:0;height:2px;background:var(--accent);z-index:5;}
+  .gExBody{overflow-y:auto;padding:6px;}
+  .gExBody .exCard{margin-bottom:6px;padding:6px 8px;}
+  .gExBody .exCat{font-size:10.5px;font-weight:700;color:#ffd166;margin:6px 0 4px;}
+
+  /* ===== ポップアップ ===== */
+  #modalWrap{
+    position:fixed;inset:0;z-index:50;background:#000000aa;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  #modalWrap[hidden]{display:none;}
+  #modalCard{
+    position:relative;background:var(--card2);border:1px solid var(--line);border-radius:16px;
+    width:100%;max-width:440px;max-height:82vh;overflow-y:auto;padding:18px 16px 16px;
+  }
+  #modalClose{
+    position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;
+    background:#ffffff14;border:none;color:var(--text);font-size:14px;cursor:pointer;
+  }
+  .mTitle{font-size:16px;font-weight:700;padding-right:32px;}
+  .mMeta{margin-top:4px;font-size:12px;color:var(--sub);}
+  .mPerf{margin-top:6px;font-size:12.5px;color:var(--sub);line-height:1.5;}
+  #modalCard .camRow{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;}
+  .mImg{display:block;width:100%;border-radius:10px;margin-top:12px;}
+  .mSection{margin-top:14px;}
+  .mHead{font-size:12px;font-weight:700;color:#ffd166;margin-bottom:4px;}
+  .mTips{font-size:12.5px;line-height:1.7;}
+  .mList{margin:0;padding-left:18px;font-size:12.5px;line-height:1.7;}
+  .mNote{margin-top:12px;font-size:11.5px;color:#ffd166;}
+
+  #installHint{
+    position:fixed;left:0;right:0;bottom:0;background:#262636;border-top:1px solid var(--line);
+    padding:10px 16px;font-size:12px;color:var(--sub);display:none;z-index:30;
+  }
+  #installHint b{color:var(--text);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="eventName">稲稜祭タイムテーブル</h1>
+  <div class="meta">
+    <span id="eventDate"></span>
+    <span id="netStatus"><span class="dot"></span><span id="netLabel">オンライン</span></span>
+  </div>
+  <div id="updateBanner">
+    <span>新しいタイムテーブルが届いています</span>
+    <button id="applyUpdateBtn">更新する</button>
+  </div>
+  <div class="dayTabs" id="dayTabs"></div>
+  <div class="tabs" id="stageTabs"></div>
+  <div class="filterRow" id="filterRow">
+    <span>担当で絞り込み:</span>
+    <select id="camFilter"><option value="">全員</option></select>
+  </div>
+  <div class="camLegend" id="camLegend"><b class="lgOwn">カ</b>=ご持参カメラ / <b class="lgMori">杜①〜⑤</b>=杜カメラ（広報委員会）</div>
+</header>
+
+<main id="main"></main>
+
+<div id="modalWrap" hidden>
+  <div id="modalCard">
+    <button id="modalClose" aria-label="閉じる">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="installHint"><b>ワンポイント：</b> 一度開いておけば、電波が悪くても直前の内容がそのまま見られます。</div>
+
+<script>
+const STORAGE_KEY = "bunkasai_timetable_cache_v1";
+let DATA = null;
+let currentDay = null;
+let currentStage = null; // stage id, or "__exhibits__"
+
+// 640px以上（横向きスマホ・PC）は全ステージ横並びのグリッド表示
+const wideMQ = window.matchMedia("(min-width: 640px)");
+wideMQ.addEventListener("change", ()=>{ if(DATA) render(DATA); });
+
+function loadCached(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; }
+}
+function saveCached(data){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+async function fetchFresh(){
+  const res = await fetch("data.json", {cache:"no-store"});
+  if(!res.ok) throw new Error("fetch failed");
+  return await res.json();
+}
+
+// tips用の画像を裏で1回取得しておく（Service Workerがキャッシュし、当日オフラインでも表示できる）
+function prefetchImages(data){
+  (data.programs||[]).forEach(p=>{ if(p.image) fetch(p.image).catch(()=>{}); });
+}
+
+function timeToMinutes(t){
+  const [h,m] = t.split(":").map(Number);
+  return h*60+m;
+}
+function nowMinutes(){
+  const d = new Date();
+  return d.getHours()*60 + d.getMinutes();
+}
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+// その日が今日か・過去か・未来か。isoDate未設定の旧データは従来どおり時刻だけで判定
+function dayStatus(dayObj){
+  if(!dayObj || !dayObj.isoDate) return "today";
+  const t = todayISO();
+  if(dayObj.isoDate < t) return "past";
+  if(dayObj.isoDate > t) return "future";
+  return "today";
+}
+// プログラムの状態: "past" | "now" | "upcoming"
+function progState(p, dayObj){
+  const ds = dayStatus(dayObj);
+  if(ds === "past") return "past";
+  if(ds === "future") return "upcoming";
+  const nm = nowMinutes();
+  const s = timeToMinutes(p.start), e = timeToMinutes(p.end);
+  if(e <= nm) return "past";
+  if(s <= nm && nm < e) return "now";
+  return "upcoming";
+}
+
+// camera を {name, cam} の配列に正規化する。
+// 対応形式: [{name,cam}] / ["野田","内山"] / "野田・内山"（旧キャッシュとの互換用）
+// cam: "カ"=ご持参カメラ, "1"〜"5"=杜カメラ①〜⑤, 不明は null
+function toCamList(camera){
+  if(!camera) return [];
+  const arr = Array.isArray(camera) ? camera
+    : String(camera).split(/[・,、]/).map(s=>s.trim()).filter(Boolean);
+  return arr.map(c=>
+    typeof c === "object" ? { name: c.name, cam: c.cam || null } : { name: c, cam: null }
+  );
+}
+const CIRCLED = { "1":"①", "2":"②", "3":"③", "4":"④", "5":"⑤" };
+function camLabel(cam){
+  if(cam === "カ") return "カ";
+  if(CIRCLED[cam]) return "杜" + CIRCLED[cam];
+  return "";
+}
+// タグ表示: 杜カメラは同じ番号を「杜① 高田・水飼」のように1つのタグにまとめる。持参カメラは1人1タグ
+function camTagsHTML(p, selectedName){
+  const list = toCamList(p.camera);
+  const seenMori = new Set();
+  const tags = [];
+  list.forEach(c=>{
+    if(CIRCLED[c.cam]){
+      if(seenMori.has(c.cam)) return;
+      seenMori.add(c.cam);
+      const names = list.filter(x=>x.cam===c.cam).map(x=>x.name);
+      let cls = "cam camMori";
+      if(selectedName && names.includes(selectedName)) cls += " camActive";
+      tags.push(`<span class="${cls}">📷 <b>杜${CIRCLED[c.cam]}</b> ${names.join("・")}</span>`);
+    }else{
+      let cls = "cam" + (c.cam === "カ" ? " camOwn" : "");
+      if(c.name === selectedName) cls += " camActive";
+      tags.push(`<span class="${cls}">📷${c.cam === "カ" ? " <b>カ</b>" : ""} ${c.name}</span>`);
+    }
+  });
+  return tags.join("");
+}
+// グリッドのブロック用の1行テキスト版（同じまとめ方）
+function camSummary(p){
+  const list = toCamList(p.camera);
+  const seenMori = new Set();
+  const out = [];
+  list.forEach(c=>{
+    if(CIRCLED[c.cam]){
+      if(seenMori.has(c.cam)) return;
+      seenMori.add(c.cam);
+      out.push("杜" + CIRCLED[c.cam] + " " + list.filter(x=>x.cam===c.cam).map(x=>x.name).join("・"));
+    }else{
+      out.push((c.cam === "カ" ? "カ " : "") + c.name);
+    }
+  });
+  return out.join(" / ");
+}
+function stageOf(data, id){ return data.stages.find(s=>s.id===id); }
+
+// ===== ポップアップ =====
+const modalWrap = document.getElementById("modalWrap");
+const modalBody = document.getElementById("modalBody");
+document.getElementById("modalClose").onclick = closeModal;
+modalWrap.onclick = (e)=>{ if(e.target === modalWrap) closeModal(); };
+document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
+function closeModal(){ modalWrap.hidden = true; }
+
+// 杜カメラの受け渡し先: 同じ番号のカメラを次に使う「別のプログラム」を同日の全プログラムから探す
+// （1台を同じプログラム内で複数人が使う場合があるので、番号単位でまとめて判定する）
+function handoverHTML(p, data){
+  const list = toCamList(p.camera);
+  const moriNos = Array.from(new Set(list.filter(c=>CIRCLED[c.cam]).map(c=>c.cam)));
+  if(moriNos.length === 0) return "";
+  const rows = moriNos.map(no=>{
+    const holders = list.filter(c=>c.cam===no).map(c=>c.name);
+    const next = data.programs
+      .filter(q=>q.dayId===p.dayId && q!==p && timeToMinutes(q.start) >= timeToMinutes(p.start))
+      .map(q=>({prog:q, names:toCamList(q.camera).filter(x=>x.cam===no).map(x=>x.name)}))
+      .filter(u=>u.names.length > 0)
+      .sort((a,b)=>timeToMinutes(a.prog.start)-timeToMinutes(b.prog.start))[0];
+    const label = `杜${CIRCLED[no]}（${holders.join("・")}）`;
+    if(next){
+      const st = stageOf(data, next.prog.stageId);
+      const same = next.names.join("・") === holders.join("・");
+      return `<li>${label} → 次は ${next.prog.start}〜 ${st ? st.name : ""}「${next.prog.title}」${same ? "（引き続き同じ担当）" : `の ${next.names.join("・")} さんへ`}</li>`;
+    }
+    return `<li>${label} → この後の割り当てなし（本部へ返却）</li>`;
+  }).join("");
+  return `<div class="mSection"><div class="mHead">🔄 カメラ受け渡し</div><ul class="mList">${rows}</ul></div>`;
+}
+
+function openModal(p, data, selectedName){
+  const st = stageOf(data, p.stageId);
+  const dayObj = data.days.find(d=>d.id===p.dayId);
+  modalBody.innerHTML = `
+    <div class="mTitle">${p.title}</div>
+    <div class="mMeta">${dayObj ? dayObj.label + " " + dayObj.date : ""} ／ <span style="color:${st.color}">${st.name}</span> ／ ${p.start}-${p.end}</div>
+    ${p.performer ? `<div class="mPerf">${p.performer}</div>` : ""}
+    <div class="camRow">${camTagsHTML(p, selectedName)}</div>
+    ${p.image ? `<img class="mImg" src="${p.image}" alt="撮影イメージ">` : ""}
+    ${p.tips ? `<div class="mSection"><div class="mHead">📸 撮影のコツ</div><div class="mTips">${p.tips}</div></div>` : ""}
+    ${handoverHTML(p, data)}
+    ${p.note ? `<div class="mNote">${p.note}</div>` : ""}
+  `;
+  modalWrap.hidden = false;
+  document.getElementById("modalCard").scrollTop = 0;
+}
+
+// ===== お知らせ =====
+function noticesHTML(data){
+  const n = data.notices || [];
+  if(n.length === 0) return "";
+  return `<details class="notices"><summary>📢 お知らせ（${n.length}件）</summary><ul>${n.map(x=>`<li>${x}</li>`).join("")}</ul></details>`;
+}
+
+// ===== SDカード割り振り（表示中の日ぶん） =====
+function sdHTML(data){
+  const sd = (data.sdCards || {})[currentDay];
+  if(!sd || sd.length === 0) return "";
+  const cells = sd.map(x=>
+    `<div class="sdCell${x.use ? "" : " sdSpare"}"><b>${x.id}</b> ${x.use || "予備"}</div>`
+  ).join("");
+  return `<details class="notices sdBox"><summary>💾 SDカード割り振り</summary><div class="sdGrid">${cells}</div></details>`;
+}
+
+// ===== 縦持ち: カード1枚ぶんのDOM =====
+function buildItem(p, data, dayObj, selectedName, stageChip){
+  const div = document.createElement("div");
+  const state = progState(p, dayObj);
+  let cls = "item";
+  if(state === "past") cls += " pastItem";
+  if(state === "now") cls += " nowItem";
+  div.className = cls;
+  const chip = stageChip
+    ? `<span class="stageChip" style="background:${stageChip.color}">${stageChip.name}</span>` : "";
+  div.innerHTML = `
+    <div class="time">${p.start}</div>
+    <div class="dot"></div>
+    <div class="title">${chip}${p.title}${state === "past" ? '<span class="doneBadge">終了</span>' : ""}</div>
+    <div class="sub"><span>${p.performer||""}</span><span>${p.start}-${p.end}</span></div>
+    <div class="camRow">${camTagsHTML(p, selectedName)}</div>
+    ${p.note ? `<div class="note">${p.note}</div>` : ""}
+  `;
+  div.onclick = ()=> openModal(p, data, selectedName);
+  return div;
+}
+
+// ===== 横並びグリッド: 同時間帯の重なりをレーンに分ける =====
+function layoutLanes(items){
+  const res = items.map(p=>({ p, lane: 0, lanes: 1 }));
+  let cluster = [], laneEnds = [], clusterEnd = -1;
+  const flush = ()=>{ cluster.forEach(w=>w.lanes = laneEnds.length); cluster = []; laneEnds = []; };
+  res.forEach(w=>{
+    const s = timeToMinutes(w.p.start), e = timeToMinutes(w.p.end);
+    if(cluster.length && s >= clusterEnd) flush();
+    let lane = laneEnds.findIndex(le=>le <= s);
+    if(lane === -1){ lane = laneEnds.length; laneEnds.push(e); } else { laneEnds[lane] = e; }
+    w.lane = lane;
+    clusterEnd = cluster.length ? Math.max(clusterEnd, e) : e;
+    cluster.push(w);
+  });
+  flush();
+  return res;
+}
+
+const GRID_PX_PER_MIN = 2;
+
+function renderGrid(data, mainEl, dayObj, camVal){
+  const progs = data.programs.filter(p=>p.dayId===currentDay);
+  if(progs.length === 0){
+    mainEl.insertAdjacentHTML("beforeend", '<div class="emptyMsg">プログラムがありません</div>');
+    return;
+  }
+  const minS = Math.min(...progs.map(p=>timeToMinutes(p.start)));
+  const maxE = Math.max(...progs.map(p=>timeToMinutes(p.end)));
+  const top0 = Math.floor(minS/60)*60;
+  const bot = Math.ceil(maxE/60)*60;
+  const H = (bot - top0) * GRID_PX_PER_MIN;
+  const nm = nowMinutes();
+  const showNow = dayStatus(dayObj) === "today" && nm >= top0 && nm <= bot;
+
+  const wrap = document.createElement("div");
+  wrap.className = "gridWrap";
+
+  // 時刻列
+  const tCol = document.createElement("div");
+  tCol.className = "gTimeCol";
+  let tLabels = "";
+  for(let m = top0; m <= bot; m += 60){
+    tLabels += `<span class="gHourLabel" style="top:${(m-top0)*GRID_PX_PER_MIN}px">${Math.floor(m/60)}:00</span>`;
+  }
+  tCol.innerHTML = `<div class="gColHead"></div><div class="gColBody" style="height:${H}px">${tLabels}</div>`;
+  wrap.appendChild(tCol);
+
+  // ステージ列
+  data.stages.forEach(st=>{
+    const col = document.createElement("div");
+    col.className = "gCol";
+    const head = document.createElement("div");
+    head.className = "gColHead";
+    head.style.background = st.color;
+    head.textContent = st.name;
+    const body = document.createElement("div");
+    body.className = "gColBody";
+    body.style.height = H + "px";
+    for(let m = top0 + 60; m < bot; m += 60){
+      body.insertAdjacentHTML("beforeend", `<div class="gHourLine" style="top:${(m-top0)*GRID_PX_PER_MIN}px"></div>`);
+    }
+    const items = progs.filter(p=>p.stageId===st.id)
+      .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
+    layoutLanes(items).forEach(w=>{
+      const p = w.p;
+      const s = timeToMinutes(p.start), e = timeToMinutes(p.end);
+      const b = document.createElement("div");
+      const state = progState(p, dayObj);
+      let cls = "gBlock";
+      if(state === "past") cls += " gPast";
+      if(state === "now") cls += " gNow";
+      if(camVal && !toCamList(p.camera).some(c=>c.name===camVal)) cls += " gDim";
+      b.className = cls;
+      const wPct = 100 / w.lanes;
+      b.style.top = (s-top0)*GRID_PX_PER_MIN + "px";
+      b.style.height = Math.max((e-s)*GRID_PX_PER_MIN - 2, 14) + "px";
+      b.style.left = `calc(${w.lane * wPct}% + 2px)`;
+      b.style.width = `calc(${wPct}% - 4px)`;
+      b.style.background = st.color + "26";
+      b.style.borderLeftColor = st.color;
+      b.innerHTML = `<div class="gT">${p.title}</div>
+        ${p.note ? `<div class="gNoteLine">⚠ ${p.note}</div>` : ""}
+        <div class="gTime">${p.start}-${p.end}</div><div class="gTime">📷${camSummary(p)}</div>`;
+      b.onclick = ()=> openModal(p, data, camVal);
+      body.appendChild(b);
+    });
+    if(showNow){
+      body.insertAdjacentHTML("beforeend", `<div class="gNowLine" style="top:${(nm-top0)*GRID_PX_PER_MIN}px"></div>`);
+    }
+    col.appendChild(head);
+    col.appendChild(body);
+    wrap.appendChild(col);
+  });
+
+  // 展示・企画列（時間なしのリスト）
+  const exCol = document.createElement("div");
+  exCol.className = "gExCol";
+  let exHTML = "";
+  (data.exhibits||[]).forEach(group=>{
+    exHTML += `<div class="exCat">${group.category}</div>`;
+    group.items.forEach(it=>{
+      exHTML += `<div class="exCard"><div class="name">${it.name}</div><div class="desc">${it.desc||""}</div></div>`;
+    });
+  });
+  exCol.innerHTML = `<div class="gColHead" style="background:#ffd166">展示・企画</div>
+    <div class="gColBody gExBody" style="height:${H}px">${exHTML}</div>`;
+  wrap.appendChild(exCol);
+
+  mainEl.appendChild(wrap);
+}
+
+function render(data){
+  document.getElementById("eventName").textContent = data.eventName || "稲稜祭タイムテーブル";
+
+  if(!currentDay) currentDay = data.days[0].id;
+  if(!currentStage) currentStage = data.stages[0].id;
+
+  const isWide = wideMQ.matches;
+  const dayObj = data.days.find(d=>d.id===currentDay);
+  document.getElementById("eventDate").textContent = dayObj ? (dayObj.label + " " + dayObj.date) : "";
+
+  // day tabs
+  const dayTabsEl = document.getElementById("dayTabs");
+  dayTabsEl.innerHTML = "";
+  data.days.forEach(d=>{
+    const b = document.createElement("button");
+    b.className = "dayTab" + (d.id===currentDay ? " active":"");
+    b.textContent = d.label;
+    b.onclick = ()=>{ currentDay = d.id; render(data); };
+    dayTabsEl.appendChild(b);
+  });
+
+  // 担当者プルダウン（その日の全プログラムから1人ずつ）
+  const camSel = document.getElementById("camFilter");
+  const prevVal = camSel.value;
+  const cams = Array.from(new Set(
+    data.programs.filter(p=>p.dayId===currentDay).flatMap(p=>toCamList(p.camera).map(c=>c.name))
+  )).sort();
+  camSel.innerHTML = '<option value="">全員</option>' + cams.map(c=>`<option value="${c}">${c}</option>`).join("");
+  camSel.value = cams.includes(prevVal) ? prevVal : "";
+  camSel.onchange = ()=> render(data);
+  const camVal = camSel.value;
+
+  // stage tabs（横並びグリッド時は全部見えるので非表示）
+  const tabsEl = document.getElementById("stageTabs");
+  tabsEl.style.display = isWide ? "none" : "flex";
+  tabsEl.innerHTML = "";
+  const myDayMode = !isWide && camVal && currentStage !== "__exhibits__";
+  if(!isWide){
+    data.stages.forEach(st=>{
+      const b = document.createElement("button");
+      const act = !myDayMode && st.id===currentStage;
+      b.className = "tab" + (act ? " active":"");
+      b.textContent = st.name;
+      b.style.background = act ? st.color : "";
+      b.onclick = ()=>{ currentStage = st.id; render(data); };
+      tabsEl.appendChild(b);
+    });
+    const exB = document.createElement("button");
+    exB.className = "tab" + (currentStage==="__exhibits__" ? " active":"");
+    exB.textContent = "展示・企画";
+    exB.style.background = currentStage==="__exhibits__" ? "#ffd166" : "";
+    exB.onclick = ()=>{ currentStage = "__exhibits__"; render(data); };
+    tabsEl.appendChild(exB);
+  }
+
+  const isExhibits = !isWide && currentStage === "__exhibits__";
+  document.getElementById("filterRow").style.display = isExhibits ? "none" : "flex";
+  document.getElementById("camLegend").style.display = isExhibits ? "none" : "block";
+
+  const mainEl = document.getElementById("main");
+  mainEl.innerHTML = noticesHTML(data) + sdHTML(data);
+
+  // ===== 横並びグリッド（横向き・PC） =====
+  if(isWide){
+    renderGrid(data, mainEl, dayObj, camVal);
+    return;
+  }
+
+  // ===== 展示・企画 =====
+  if(isExhibits){
+    (data.exhibits||[]).forEach(group=>{
+      const g = document.createElement("div");
+      g.className = "exGroup";
+      g.innerHTML = `<h2>${group.category}</h2>`;
+      const grid = document.createElement("div");
+      grid.className = "exGrid";
+      group.items.forEach(it=>{
+        const c = document.createElement("div");
+        c.className = "exCard";
+        c.innerHTML = `<div class="name">${it.name}</div><div class="desc">${it.desc||""}</div>`;
+        grid.appendChild(c);
+      });
+      g.appendChild(grid);
+      mainEl.appendChild(g);
+    });
+    return;
+  }
+
+  // ===== 自分の一日ビュー（担当で絞り込み中は全ステージ横断） =====
+  if(myDayMode){
+    const block = document.createElement("div");
+    block.className = "stageBlock";
+    block.innerHTML = `<h2>${camVal} さんの担当（全ステージ）</h2>
+      <div class="viewHint">「全員」に戻すとステージ別の表示になります</div>`;
+    const items = data.programs
+      .filter(p=>p.dayId===currentDay && toCamList(p.camera).some(c=>c.name===camVal))
+      .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
+    if(items.length === 0){
+      block.insertAdjacentHTML("beforeend", '<div class="emptyMsg">該当するプログラムはありません</div>');
+    }else{
+      const tl = document.createElement("div");
+      tl.className = "timeline";
+      items.forEach(p=>{
+        tl.appendChild(buildItem(p, data, dayObj, camVal, stageOf(data, p.stageId)));
+      });
+      block.appendChild(tl);
+    }
+    mainEl.appendChild(block);
+    return;
+  }
+
+  // ===== ステージ別タイムライン（縦持ち・従来表示） =====
+  const stage = stageOf(data, currentStage);
+  const block = document.createElement("div");
+  block.className = "stageBlock";
+  const h2 = document.createElement("h2");
+  h2.textContent = stage.name;
+  h2.style.borderLeftColor = stage.color;
+  block.appendChild(h2);
+
+  const items = data.programs
+    .filter(p=>p.dayId===currentDay && p.stageId===stage.id)
+    .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
+
+  if(items.length === 0){
+    block.insertAdjacentHTML("beforeend", '<div class="emptyMsg">該当するプログラムはありません</div>');
+  }else{
+    const tl = document.createElement("div");
+    tl.className = "timeline";
+    items.forEach(p=>{
+      tl.appendChild(buildItem(p, data, dayObj, camVal, null));
+    });
+    block.appendChild(tl);
+  }
+  mainEl.appendChild(block);
+}
+
+function updateNetStatus(){
+  const el = document.getElementById("netStatus");
+  const label = document.getElementById("netLabel");
+  if(navigator.onLine){ el.classList.remove("offline"); label.textContent="オンライン"; }
+  else{ el.classList.add("offline"); label.textContent="オフライン（保存済み表示中）"; }
+}
+window.addEventListener("online", updateNetStatus);
+window.addEventListener("offline", updateNetStatus);
+
+async function init(){
+  updateNetStatus();
+  const cached = loadCached();
+  if(cached){
+    DATA = cached;
+    render(DATA);
+  }
+  try{
+    const fresh = await fetchFresh();
+    if(!cached){
+      DATA = fresh; saveCached(fresh); render(DATA); prefetchImages(fresh);
+    } else if(fresh.version > cached.version){
+      const banner = document.getElementById("updateBanner");
+      banner.style.display = "flex";
+      document.getElementById("applyUpdateBtn").onclick = ()=>{
+        DATA = fresh; saveCached(fresh); banner.style.display="none"; render(DATA); prefetchImages(fresh);
+      };
+    } else {
+      saveCached(fresh); prefetchImages(fresh);
+    }
+  }catch(e){
+    if(!cached){
+      document.getElementById("main").innerHTML =
+        '<div class="emptyMsg">電波が悪く読み込めませんでした。電波の良い場所でもう一度開いてください。</div>';
+    }
+    document.getElementById("installHint").style.display = "block";
+  }
+}
+
+setInterval(()=>{ if(DATA) render(DATA); }, 60000);
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "稲稜祭タイムテーブル",
+  "short_name": "稲稜祭",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#14141c",
+  "theme_color": "#14141c",
+  "icons": []
+}
