@@ -1,5 +1,11 @@
-const CACHE_NAME = "bunkasai-timetable-v3";
-const APP_SHELL = ["./", "./index.html", "./manifest.json"];
+const CACHE_NAME = "bunkasai-timetable-v4";
+const APP_SHELL = [
+  "./", "./index.html", "./manifest.json",
+  "./icons/favicon.svg", "./icons/favicon.ico",
+  "./icons/favicon-16.png", "./icons/favicon-32.png", "./icons/favicon-48.png",
+  "./icons/apple-touch-icon.png", "./icons/icon-192.png", "./icons/icon-512.png",
+  "./icons/icon-512-maskable.png",
+];
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
