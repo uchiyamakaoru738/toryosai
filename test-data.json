@@ -1,0 +1,15 @@
+{
+  "eventName": "稲稜祭タイムテーブル（LINE通知リマインド テスト用）",
+  "version": 1,
+  "updatedAt": "2026-10-04T16:09:00+09:00",
+  "updateNote": "このファイルはLINE通知の個人宛てリマインド(FR-4)のテスト専用データです。公開アプリ(index.html)はこのファイルを読み込みません。",
+  "days": [
+    { "id": "test", "label": "テスト日", "date": "テスト", "isoDate": "2026-10-04" }
+  ],
+  "stages": [
+    { "id": "test", "name": "テストステージ", "color": "#ff5470" }
+  ],
+  "programs": [
+    { "id": "test-01", "dayId": "test", "stageId": "test", "start": "16:23", "end": "16:40", "title": "リマインドテスト", "performer": "テスト団体", "camera": [{ "name": "内山", "cam": "カ" }] }
+  ]
+}
