@@ -84,7 +84,14 @@
     background:var(--card2);color:var(--sub);white-space:nowrap;border:1px solid var(--line);
   }
   .tab.active{color:var(--text);border-color:transparent;box-shadow:0 4px 12px -6px rgba(36,27,61,.35);}
-  .filterRow{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--sub);}
+  .filterDetails{margin-top:10px;}
+  .filterDetails summary{
+    cursor:pointer;font-size:12px;font-weight:700;color:var(--accent);
+    list-style:revert;
+  }
+  .filterDetails[open] summary{margin-bottom:8px;}
+  .filterRow{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--sub);}
+  .filterRow:first-of-type{margin-top:0;}
   .filterRow select{
     background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;
     padding:5px 8px;font-size:12.5px;flex:1;
@@ -270,15 +277,18 @@
   </div>
   <div class="dayTabs" id="dayTabs"></div>
   <div class="tabs" id="stageTabs"></div>
-  <div class="filterRow" id="filterRow">
-    <span>担当で絞り込み:</span>
-    <select id="camFilter"><option value="">全員</option></select>
-  </div>
-  <div class="filterRow" id="camNumFilterRow">
-    <span>カメラで絞り込み:</span>
-    <select id="camNumFilter"><option value="">指定なし</option></select>
-  </div>
-  <div class="camLegend" id="camLegend"><b class="lgOwn">カ</b>=持参カメラ / <b class="lgMori">杜①〜⑤</b>=杜カメラ（杜編集）</div>
+  <details class="filterDetails" id="filterDetails">
+    <summary id="filterSummary">🔎 絞り込み・凡例</summary>
+    <div class="filterRow" id="filterRow">
+      <span>担当で絞り込み:</span>
+      <select id="camFilter"><option value="">全員</option></select>
+    </div>
+    <div class="filterRow" id="camNumFilterRow">
+      <span>カメラで絞り込み:</span>
+      <select id="camNumFilter"><option value="">指定なし</option></select>
+    </div>
+    <div class="camLegend" id="camLegend"><b class="lgOwn">カ</b>=持参カメラ / <b class="lgMori">杜①〜⑤</b>=杜カメラ（杜編集）</div>
+  </details>
 </header>
 
 <main id="main"></main>
@@ -693,9 +703,9 @@ function render(data){
   }
 
   const isExhibits = !isWide && currentStage === "__exhibits__";
-  document.getElementById("filterRow").style.display = isExhibits ? "none" : "flex";
-  document.getElementById("camNumFilterRow").style.display = isExhibits ? "none" : "flex";
-  document.getElementById("camLegend").style.display = isExhibits ? "none" : "block";
+  const filterDetails = document.getElementById("filterDetails");
+  filterDetails.style.display = isExhibits ? "none" : "block";
+  if(camVal || camNumVal) filterDetails.open = true;
 
   const mainEl = document.getElementById("main");
   mainEl.innerHTML = noticesHTML(data) + sdHTML(data);
