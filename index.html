@@ -28,6 +28,7 @@
     --cyan-text:#00708c;
     --cyan-tint:#00b4d824;
     --cyan-border:#00b4d855;
+    --senior:#d6336c;
   }
   *{box-sizing:border-box;}
   html{
@@ -117,6 +118,16 @@
     color:transparent;-webkit-text-fill-color:transparent;
   }
   .viewHint{font-size:11px;color:var(--sub);margin:-4px 0 10px;}
+  .stageTip{
+    font-size:11.5px;color:var(--text);line-height:1.6;margin:-2px 0 12px;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+  }
+  .stageTip b{margin-right:4px;}
+  .exhibitTip{
+    margin-bottom:14px;font-size:11.5px;color:var(--text);line-height:1.6;
+    background:var(--cyan-tint);border:1px solid var(--cyan-border);border-radius:10px;padding:8px 10px;
+  }
+  .exhibitTip b{color:var(--cyan-text);margin-right:4px;}
   .timeline{position:relative;padding-left:62px;}
   .timeline::before{
     content:"";position:absolute;left:54px;top:0;bottom:0;width:2px;background:var(--line);
@@ -206,6 +217,7 @@
   .gExBody{overflow-y:auto;padding:6px;}
   .gExBody .exCard{margin-bottom:6px;padding:6px 8px;}
   .gExBody .exCat{font-size:10.5px;font-weight:700;color:var(--amber-text);margin:6px 0 4px;}
+  .gExBody .exhibitTip{font-size:10px;padding:6px 7px;margin-bottom:8px;}
 
   /* ===== ポップアップ ===== */
   #modalWrap{
@@ -227,6 +239,7 @@
   .mTitle{font-size:16px;font-weight:700;padding-right:32px;}
   .mMeta{margin-top:4px;font-size:12px;color:var(--sub);}
   .mPerf{margin-top:6px;font-size:12.5px;color:var(--sub);line-height:1.5;}
+  .perf3rd{font-weight:800;color:var(--senior);}
   #modalCard .camRow{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;}
   .mImg{display:block;width:100%;border-radius:10px;margin-top:12px;}
   .mSection{margin-top:14px;}
@@ -261,7 +274,11 @@
     <span>担当で絞り込み:</span>
     <select id="camFilter"><option value="">全員</option></select>
   </div>
-  <div class="camLegend" id="camLegend"><b class="lgOwn">カ</b>=ご持参カメラ / <b class="lgMori">杜①〜⑤</b>=杜カメラ（広報委員会）</div>
+  <div class="filterRow" id="camNumFilterRow">
+    <span>カメラで絞り込み:</span>
+    <select id="camNumFilter"><option value="">指定なし</option></select>
+  </div>
+  <div class="camLegend" id="camLegend"><b class="lgOwn">カ</b>=持参カメラ / <b class="lgMori">杜①〜⑤</b>=杜カメラ（杜編集）</div>
 </header>
 
 <main id="main"></main>
@@ -353,7 +370,7 @@ function camLabel(cam){
   return "";
 }
 // タグ表示: 杜カメラは同じ番号を「杜① 高田・水飼」のように1つのタグにまとめる。持参カメラは1人1タグ
-function camTagsHTML(p, selectedName){
+function camTagsHTML(p, selectedName, selectedCamNum){
   const list = toCamList(p.camera);
   const seenMori = new Set();
   const tags = [];
@@ -363,7 +380,7 @@ function camTagsHTML(p, selectedName){
       seenMori.add(c.cam);
       const names = list.filter(x=>x.cam===c.cam).map(x=>x.name);
       let cls = "cam camMori";
-      if(selectedName && names.includes(selectedName)) cls += " camActive";
+      if((selectedName && names.includes(selectedName)) || (selectedCamNum && c.cam===selectedCamNum)) cls += " camActive";
       tags.push(`<span class="${cls}">📷 <b>杜${CIRCLED[c.cam]}</b> ${names.join("・")}</span>`);
     }else{
       let cls = "cam" + (c.cam === "カ" ? " camOwn" : "");
@@ -434,14 +451,14 @@ function handoverHTML(p, data){
   return `<div class="mSection"><div class="mHead">🔄 カメラ受け渡し</div><ul class="mList">${rows}</ul></div>`;
 }
 
-function openModal(p, data, selectedName){
+function openModal(p, data, selectedName, selectedCamNum){
   const st = stageOf(data, p.stageId);
   const dayObj = data.days.find(d=>d.id===p.dayId);
   modalBody.innerHTML = `
     <div class="mTitle">${p.title}</div>
     <div class="mMeta">${dayObj ? dayObj.label + " " + dayObj.date : ""} ／ <span style="color:${st.color}">${st.name}</span> ／ ${p.start}-${p.end}</div>
     ${p.performer ? `<div class="mPerf">${p.performer}</div>` : ""}
-    <div class="camRow">${camTagsHTML(p, selectedName)}</div>
+    <div class="camRow">${camTagsHTML(p, selectedName, selectedCamNum)}</div>
     ${p.image ? `<img class="mImg" src="${p.image}" alt="撮影イメージ">` : ""}
     ${p.tips ? `<div class="mSection"><div class="mHead">📸 撮影のコツ</div><div class="mTips">${p.tips}</div></div>` : ""}
     ${handoverHTML(p, data)}
@@ -469,7 +486,7 @@ function sdHTML(data){
 }
 
 // ===== 縦持ち: カード1枚ぶんのDOM =====
-function buildItem(p, data, dayObj, selectedName, stageChip){
+function buildItem(p, data, dayObj, selectedName, stageChip, selectedCamNum){
   const div = document.createElement("div");
   const state = progState(p, dayObj);
   let cls = "item";
@@ -487,10 +504,10 @@ function buildItem(p, data, dayObj, selectedName, stageChip){
     <div class="dot"></div>
     <div class="title">${chip}${titleText}${state === "past" ? '<span class="doneBadge">終了</span>' : ""}</div>
     <div class="sub"><span>${p.performer||""}</span><span>${p.start}-${p.end}</span></div>
-    <div class="camRow">${camTagsHTML(p, selectedName)}</div>
+    <div class="camRow">${camTagsHTML(p, selectedName, selectedCamNum)}</div>
     ${p.note ? `<div class="note">${p.note}</div>` : ""}
   `;
-  div.onclick = ()=> openModal(p, data, selectedName);
+  div.onclick = ()=> openModal(p, data, selectedName, selectedCamNum);
   return div;
 }
 
@@ -514,7 +531,7 @@ function layoutLanes(items){
 
 const GRID_PX_PER_MIN = 2;
 
-function renderGrid(data, mainEl, dayObj, camVal){
+function renderGrid(data, mainEl, dayObj, camVal, camNumVal){
   const progs = data.programs.filter(p=>p.dayId===currentDay);
   if(progs.length === 0){
     mainEl.insertAdjacentHTML("beforeend", '<div class="emptyMsg">プログラムがありません</div>');
@@ -566,6 +583,7 @@ function renderGrid(data, mainEl, dayObj, camVal){
       if(state === "past") cls += " gPast";
       if(state === "now") cls += " gNow";
       if(camVal && !toCamList(p.camera).some(c=>c.name===camVal)) cls += " gDim";
+      if(camNumVal && !toCamList(p.camera).some(c=>c.cam===camNumVal)) cls += " gDim";
       b.className = cls;
       const wPct = 100 / w.lanes;
       b.style.top = (s-top0)*GRID_PX_PER_MIN + "px";
@@ -577,7 +595,7 @@ function renderGrid(data, mainEl, dayObj, camVal){
       b.innerHTML = `<div class="gT">${p.title}</div>
         ${p.note ? `<div class="gNoteLine">⚠ ${p.note}</div>` : ""}
         <div class="gTime">${p.start}-${p.end}</div><div class="gTime">📷${camSummary(p)}</div>`;
-      b.onclick = ()=> openModal(p, data, camVal);
+      b.onclick = ()=> openModal(p, data, camVal, camNumVal);
       body.appendChild(b);
     });
     if(showNow){
@@ -591,7 +609,7 @@ function renderGrid(data, mainEl, dayObj, camVal){
   // 展示・企画列（時間なしのリスト）
   const exCol = document.createElement("div");
   exCol.className = "gExCol";
-  let exHTML = "";
+  let exHTML = data.exhibitTips ? `<div class="exhibitTip"><b>📸</b>${data.exhibitTips}</div>` : "";
   (data.exhibits||[]).forEach(group=>{
     exHTML += `<div class="exCat">${group.category}</div>`;
     group.items.forEach(it=>{
@@ -628,24 +646,38 @@ function render(data){
 
   // 担当者プルダウン（その日の全プログラムから1人ずつ）
   const camSel = document.getElementById("camFilter");
+  const camNumSel = document.getElementById("camNumFilter");
   const prevVal = camSel.value;
   const cams = Array.from(new Set(
     data.programs.filter(p=>p.dayId===currentDay).flatMap(p=>toCamList(p.camera).map(c=>c.name))
   )).sort();
   camSel.innerHTML = '<option value="">全員</option>' + cams.map(c=>`<option value="${c}">${c}</option>`).join("");
   camSel.value = cams.includes(prevVal) ? prevVal : "";
-  camSel.onchange = ()=> render(data);
+
+  // 杜カメラ番号プルダウン（杜①〜⑤のみ。その日使われている番号だけ表示）
+  const prevNumVal = camNumSel.value;
+  const camNums = Array.from(new Set(
+    data.programs.filter(p=>p.dayId===currentDay).flatMap(p=>toCamList(p.camera).map(c=>c.cam))
+  )).filter(c=>CIRCLED[c]).sort();
+  camNumSel.innerHTML = '<option value="">指定なし</option>' + camNums.map(n=>`<option value="${n}">杜${CIRCLED[n]}</option>`).join("");
+  camNumSel.value = camNums.includes(prevNumVal) ? prevNumVal : "";
+
+  camSel.onchange = ()=>{ if(camSel.value) camNumSel.value = ""; render(data); };
+  camNumSel.onchange = ()=>{ if(camNumSel.value) camSel.value = ""; render(data); };
   const camVal = camSel.value;
+  const camNumVal = camNumSel.value;
 
   // stage tabs（横並びグリッド時は全部見えるので非表示）
   const tabsEl = document.getElementById("stageTabs");
   tabsEl.style.display = isWide ? "none" : "flex";
   tabsEl.innerHTML = "";
   const myDayMode = !isWide && camVal && currentStage !== "__exhibits__";
+  const myCamMode = !isWide && camNumVal && currentStage !== "__exhibits__";
+  const crossMode = myDayMode || myCamMode;
   if(!isWide){
     data.stages.forEach(st=>{
       const b = document.createElement("button");
-      const act = !myDayMode && st.id===currentStage;
+      const act = !crossMode && st.id===currentStage;
       b.className = "tab" + (act ? " active":"");
       b.textContent = st.name;
       b.style.background = act ? st.color : "";
@@ -662,6 +694,7 @@ function render(data){
 
   const isExhibits = !isWide && currentStage === "__exhibits__";
   document.getElementById("filterRow").style.display = isExhibits ? "none" : "flex";
+  document.getElementById("camNumFilterRow").style.display = isExhibits ? "none" : "flex";
   document.getElementById("camLegend").style.display = isExhibits ? "none" : "block";
 
   const mainEl = document.getElementById("main");
@@ -669,12 +702,15 @@ function render(data){
 
   // ===== 横並びグリッド（横向き・PC） =====
   if(isWide){
-    renderGrid(data, mainEl, dayObj, camVal);
+    renderGrid(data, mainEl, dayObj, camVal, camNumVal);
     return;
   }
 
   // ===== 展示・企画 =====
   if(isExhibits){
+    if(data.exhibitTips){
+      mainEl.insertAdjacentHTML("beforeend", `<div class="exhibitTip"><b>📸 撮影ポイント</b>${data.exhibitTips}</div>`);
+    }
     (data.exhibits||[]).forEach(group=>{
       const g = document.createElement("div");
       g.className = "exGroup";
@@ -708,7 +744,30 @@ function render(data){
       const tl = document.createElement("div");
       tl.className = "timeline";
       items.forEach(p=>{
-        tl.appendChild(buildItem(p, data, dayObj, camVal, stageOf(data, p.stageId)));
+        tl.appendChild(buildItem(p, data, dayObj, camVal, stageOf(data, p.stageId), camNumVal));
+      });
+      block.appendChild(tl);
+    }
+    mainEl.appendChild(block);
+    return;
+  }
+
+  // ===== カメラの一日ビュー（カメラで絞り込み中は全ステージ横断） =====
+  if(myCamMode){
+    const block = document.createElement("div");
+    block.className = "stageBlock";
+    block.innerHTML = `<h2>杜${CIRCLED[camNumVal]} の1日（全ステージ）</h2>
+      <div class="viewHint">「指定なし」に戻すとステージ別の表示になります</div>`;
+    const items = data.programs
+      .filter(p=>p.dayId===currentDay && toCamList(p.camera).some(c=>c.cam===camNumVal))
+      .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
+    if(items.length === 0){
+      block.insertAdjacentHTML("beforeend", '<div class="emptyMsg">該当するプログラムはありません</div>');
+    }else{
+      const tl = document.createElement("div");
+      tl.className = "timeline";
+      items.forEach(p=>{
+        tl.appendChild(buildItem(p, data, dayObj, camVal, stageOf(data, p.stageId), camNumVal));
       });
       block.appendChild(tl);
     }
@@ -726,6 +785,9 @@ function render(data){
   h2.style.borderLeftColor = stage.color;
   h2.style.backgroundImage = stageGradient(stage.color);
   block.appendChild(h2);
+  if(stage.tips){
+    block.insertAdjacentHTML("beforeend", `<div class="stageTip"><b>📸</b>${stage.tips}</div>`);
+  }
 
   const items = data.programs
     .filter(p=>p.dayId===currentDay && p.stageId===stage.id)
@@ -737,7 +799,7 @@ function render(data){
     const tl = document.createElement("div");
     tl.className = "timeline";
     items.forEach(p=>{
-      tl.appendChild(buildItem(p, data, dayObj, camVal, null));
+      tl.appendChild(buildItem(p, data, dayObj, camVal, null, camNumVal));
     });
     block.appendChild(tl);
   }
