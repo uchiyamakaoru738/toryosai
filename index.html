@@ -189,6 +189,10 @@
   .exCard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;box-shadow:0 6px 18px -14px rgba(36,27,61,.5);}
   .exCard .name{font-size:13px;font-weight:700;}
   .exCard .desc{font-size:11px;color:var(--sub);margin-top:2px;}
+  .exCard .room{
+    display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;color:var(--cyan-text);
+    background:var(--cyan-tint);border:1px solid var(--cyan-border);border-radius:20px;padding:2px 8px;
+  }
 
   /* ===== 横並びグリッド（横向きスマホ・PC） ===== */
   .gridWrap{display:flex;gap:8px;align-items:flex-start;}
@@ -223,6 +227,7 @@
   .gNowLine{position:absolute;left:0;right:0;height:2px;background:var(--accent);z-index:5;}
   .gExBody{overflow-y:auto;padding:6px;}
   .gExBody .exCard{margin-bottom:6px;padding:6px 8px;}
+  .gExBody .exCard .room{font-size:9.5px;padding:1px 6px;margin-top:3px;}
   .gExBody .exCat{font-size:10.5px;font-weight:700;color:var(--amber-text);margin:6px 0 4px;}
   .gExBody .exhibitTip{font-size:10px;padding:6px 7px;margin-bottom:8px;}
 
@@ -623,7 +628,7 @@ function renderGrid(data, mainEl, dayObj, camVal, camNumVal){
   (data.exhibits||[]).forEach(group=>{
     exHTML += `<div class="exCat">${group.category}</div>`;
     group.items.forEach(it=>{
-      exHTML += `<div class="exCard"><div class="name">${it.name}</div><div class="desc">${it.desc||""}</div></div>`;
+      exHTML += `<div class="exCard"><div class="name">${it.name}</div><div class="desc">${it.desc||""}</div>${it.room ? `<div class="room">📍${it.room}</div>` : ""}</div>`;
     });
   });
   exCol.innerHTML = `<div class="gColHead" style="background:#f2b705">展示・企画</div>
@@ -730,7 +735,7 @@ function render(data){
       group.items.forEach(it=>{
         const c = document.createElement("div");
         c.className = "exCard";
-        c.innerHTML = `<div class="name">${it.name}</div><div class="desc">${it.desc||""}</div>`;
+        c.innerHTML = `<div class="name">${it.name}</div><div class="desc">${it.desc||""}</div>${it.room ? `<div class="room">📍${it.room}</div>` : ""}`;
         grid.appendChild(c);
       });
       g.appendChild(grid);
